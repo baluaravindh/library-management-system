@@ -38,6 +38,13 @@ public class BookService {
     }
 
     // Get books by genre
+    public List<BookDTO> getBooksByGenreKeyword(String keyword) {
+        return bookRepository.findByGenreIsContainingIgnoreCase(keyword)
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
     public List<BookDTO> getBooksByGenre(String genre) {
         return bookRepository.findBooksByGenre(genre)
                 .stream()

@@ -36,9 +36,15 @@ public class BookController {
     }
 
     // GET by genre /api/books/genre/{genre}
-    @GetMapping("/genre/{genre}")
-    public ResponseEntity<List<BookDTO>> getAllBooksByGenre(@PathVariable String genre) {
+    @GetMapping("/genre")
+    public ResponseEntity<List<BookDTO>> getAllBooksByGenre(@RequestParam String genre) {
         return ResponseEntity.ok(bookService.getBooksByGenre(genre));
+    }
+
+    // Keyword search in genre (new)
+    @GetMapping("/genre/search")
+    public ResponseEntity<List<BookDTO>> searchByGenre(@RequestParam String keyword) {
+        return ResponseEntity.ok(bookService.getBooksByGenreKeyword(keyword));
     }
 
     // GET by genre /api/books/author/{author}
