@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -12,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -32,13 +34,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/member/logout").permitAll()
 
                         // ADMIN only
-                        .requestMatchers(HttpMethod.POST, "/api/books").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/books/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
+//                        .requestMatchers(HttpMethod.POST, "/api/books").hasRole("ADMIN")
+//                        .requestMatchers(HttpMethod.PUT, "/api/books/**").hasRole("ADMIN")
+//                        .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
 
                         // AUTHENTICATED users (any role)
-                        .requestMatchers("/api/borrow/**").authenticated()
-                        .requestMatchers("/api/member/**").authenticated()
+//                        .requestMatchers("/api/borrow/**").authenticated()
+//                        .requestMatchers("/api/member/**").authenticated()
 
                         // Everything else — authenticated
                         .anyRequest().authenticated()
