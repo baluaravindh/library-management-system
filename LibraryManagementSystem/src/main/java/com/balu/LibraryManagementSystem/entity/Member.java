@@ -36,8 +36,17 @@ public class Member {
 
     private boolean active = true;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
     @Column(nullable = false)
     private LocalDateTime createdDate;
+
+    public enum Role {
+        ADMIN,
+        MEMBER
+    }
 
     @PrePersist
     protected void onCreate() {

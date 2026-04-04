@@ -1,6 +1,7 @@
 package com.balu.LibraryManagementSystem.service;
 
 import com.balu.LibraryManagementSystem.dto.LoginRequestDto;
+import com.balu.LibraryManagementSystem.dto.LoginResponseDto;
 import com.balu.LibraryManagementSystem.dto.MemberRequestDto;
 import com.balu.LibraryManagementSystem.dto.MemberResponseDto;
 import com.balu.LibraryManagementSystem.entity.Member;
@@ -8,6 +9,8 @@ import com.balu.LibraryManagementSystem.exception.DuplicateEmailException;
 import com.balu.LibraryManagementSystem.exception.InvalidCredentialsException;
 import com.balu.LibraryManagementSystem.exception.ResourceNotFoundException;
 import com.balu.LibraryManagementSystem.repository.MemberRepository;
+import com.balu.LibraryManagementSystem.security.JwtFilter;
+import com.balu.LibraryManagementSystem.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final JwtUtil jwtUtil;
 
     // REGISTER
     public MemberResponseDto register(MemberRequestDto dto) {
@@ -33,21 +37,35 @@ public class MemberService {
         member.setEmail(dto.getEmail());
         member.setPassword(encoder.encode(dto.getPassword()));
         member.setPhone(dto.getPhone());
+        member.setRole(Member.Role.MEMBER); // DEFAULT
 
         Member saved = memberRepository.save(member);
         return mapToDto(saved);
     }
 
     // LOGIN
-    public MemberResponseDto login(LoginRequestDto dto) {
+    // UPDATE login method — change return type to LoginResponseDTO
+    public LoginResponseDto login(LoginRequestDto dto) {
         // Check if email present or not
         Member member = memberRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("No account found with email: " + dto.getEmail()));
+
         // Check if password matches with member and dto
         if (!encoder.matches(dto.getPassword(), member.getPassword())) {
             throw new InvalidCredentialsException("Invalid Password");
         }
-        return mapToDto(member);
+
+        // Generate JWT token
+        String accessToken = jwtUtil.generateToken(member.getEmail(), member.getRole().name());
+
+        return new LoginResponseDto(
+                member.getId(),
+                member.getFullName(),
+                member.getEmail(),
+                member.getRole().name(),
+                accessToken,
+                "Bearer"
+        );
     }
 
     public List<MemberResponseDto> getAllMembers() {
@@ -64,6 +82,7 @@ public class MemberService {
                 member.getFullName(),
                 member.getEmail(),
                 member.getPhone(),
+                member.getRole().name(),
                 member.getMembershipDate(),
                 member.getCreatedDate()
         );
