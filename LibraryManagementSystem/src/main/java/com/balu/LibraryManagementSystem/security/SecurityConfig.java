@@ -28,6 +28,8 @@ public class SecurityConfig {
                         // PUBLIC endpoints — no token needed
                         .requestMatchers("/api/books/register").permitAll()
                         .requestMatchers("api/member/login").permitAll()
+                        .requestMatchers("/api/member/refresh").permitAll()
+                        .requestMatchers("/api/member/logout").permitAll()
 
                         // ADMIN only
                         .requestMatchers(HttpMethod.POST, "/api/books").hasRole("ADMIN")

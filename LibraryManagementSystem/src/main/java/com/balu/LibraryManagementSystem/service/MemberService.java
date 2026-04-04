@@ -5,6 +5,7 @@ import com.balu.LibraryManagementSystem.dto.LoginResponseDto;
 import com.balu.LibraryManagementSystem.dto.MemberRequestDto;
 import com.balu.LibraryManagementSystem.dto.MemberResponseDto;
 import com.balu.LibraryManagementSystem.entity.Member;
+import com.balu.LibraryManagementSystem.entity.RefreshToken;
 import com.balu.LibraryManagementSystem.exception.DuplicateEmailException;
 import com.balu.LibraryManagementSystem.exception.InvalidCredentialsException;
 import com.balu.LibraryManagementSystem.exception.ResourceNotFoundException;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final RefreshTokenService refreshTokenService;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private final JwtUtil jwtUtil;
 
@@ -58,13 +60,17 @@ public class MemberService {
         // Generate JWT token
         String accessToken = jwtUtil.generateToken(member.getEmail(), member.getRole().name());
 
+        // Generate refresh token
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(member.getId());
+
         return new LoginResponseDto(
                 member.getId(),
                 member.getFullName(),
                 member.getEmail(),
                 member.getRole().name(),
                 accessToken,
-                "Bearer"
+                "Bearer",
+                refreshToken.getToken()
         );
     }
 

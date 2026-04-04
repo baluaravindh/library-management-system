@@ -17,4 +17,5 @@ public class LoginResponseDto {
     private String role;
     private String token;
     private String tokenType;
+    private String refreshToken;
 }
